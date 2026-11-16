@@ -2,6 +2,10 @@
 
 A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. Version 1 is a static website made with HTML, CSS, and vanilla JavaScript. It needs no installation, build step, framework, or server.
 
+**Live site:** <https://bishwa011.github.io/portfolio-website/>
+
+**Source repository:** <https://github.com/bishwa011/portfolio-website>
+
 ## Project structure
 
 ```text
@@ -52,16 +56,17 @@ After changing a file, save it and refresh the browser. On GitHub Pages, allow a
 
 ## Deploy to GitHub Pages
 
-The source folder must be placed in a GitHub repository before Pages can publish it. On GitHub Free, the repository must be public, and the published page is public.
+This project is already published from the public [`portfolio-website` repository](https://github.com/bishwa011/portfolio-website). Pages uses the `main` branch and `/ (root)` folder. `index.html` is the entry file, and the relative paths to `css/`, `js/`, and `assets/` work at the project's Pages URL.
 
-1. Create a new GitHub repository for this project. A repository named `bishwa011.github.io` can use the root account address; another name will use a project URL such as `https://bishwa011.github.io/portfolio-website/`.
-2. Add the contents of this folder to the repository. Keep `index.html` at the repository root. Keep `css/`, `js/`, and `assets/` beside it; the site uses relative paths for these files.
-3. Push the files to the repository's `main` branch.
-4. In GitHub, open the repository's **Settings → Pages**.
-5. Under the build and deployment source, select **Deploy from a branch**, choose `main` and the `/ (root)` folder, then save.
-6. Wait for the Pages deployment to finish. The Pages settings page will show the published site link.
+For future edits:
 
-For future edits, save the changes, commit them, and push to `main`; Pages will publish the updated static files. Never put private information, passwords, or secrets in a public repository or website.
+1. Save your local changes.
+2. Stage the files you changed, for example: `git add index.html css/style.css`.
+3. Save a checkpoint with a clear message, for example: `git commit -m "Update portfolio introduction"`.
+4. Send the commit to GitHub with `git push`.
+5. GitHub Pages automatically publishes the updated static files. Check the Pages deployment status in the repository's **Actions** or **Settings → Pages** area if the site does not update.
+
+On GitHub Free, the source repository and published site are public. Never put private information, passwords, or secrets in either one. The local `requirements.md` and `conversation.md` files are excluded from the public repository by `.gitignore`.
 
 ## Current limits and future improvements
 
