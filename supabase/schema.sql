@@ -23,6 +23,20 @@ grant select on public.portfolio_admins to authenticated;
 grant select on public.portfolio_content to anon, authenticated;
 grant update (content, published, updated_at) on public.portfolio_content to authenticated;
 
+-- Public portfolio files are readable by visitors. Only an approved admin can upload/manage them.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'portfolio-assets',
+  'portfolio-assets',
+  true,
+  15728640,
+  array['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
 drop policy if exists "Admins can read their own membership" on public.portfolio_admins;
 create policy "Admins can read their own membership"
   on public.portfolio_admins for select to authenticated
@@ -52,6 +66,41 @@ create policy "Admins can update portfolio content"
     select 1 from public.portfolio_admins
     where user_id = (select auth.uid())
   ));
+
+-- The bucket itself is public-read; no policy is added for listing its object names.
+drop policy if exists "Anyone can read portfolio assets" on storage.objects;
+
+drop policy if exists "Admins can upload their portfolio assets" on storage.objects;
+create policy "Admins can upload their portfolio assets"
+  on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'portfolio-assets'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and exists (select 1 from public.portfolio_admins where user_id = (select auth.uid()))
+  );
+
+drop policy if exists "Admins can update their portfolio assets" on storage.objects;
+create policy "Admins can update their portfolio assets"
+  on storage.objects for update to authenticated
+  using (
+    bucket_id = 'portfolio-assets'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and exists (select 1 from public.portfolio_admins where user_id = (select auth.uid()))
+  )
+  with check (
+    bucket_id = 'portfolio-assets'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and exists (select 1 from public.portfolio_admins where user_id = (select auth.uid()))
+  );
+
+drop policy if exists "Admins can delete their portfolio assets" on storage.objects;
+create policy "Admins can delete their portfolio assets"
+  on storage.objects for delete to authenticated
+  using (
+    bucket_id = 'portfolio-assets'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and exists (select 1 from public.portfolio_admins where user_id = (select auth.uid()))
+  );
 
 -- The seed is the existing, user-approved portfolio information.
 insert into public.portfolio_content (id, content, published)

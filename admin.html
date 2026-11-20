@@ -28,7 +28,7 @@
 
       <section class="admin-card" id="login-panel" aria-labelledby="login-title">
         <h2 id="login-title">Sign in</h2>
-        <p>Use the account created for this portfolio in Supabase. There is no public sign-up.</p>
+        <p>Use the account created for this portfolio in Supabase. There is no public sign-up. Files uploaded here are publicly viewable; upload only material you are ready to publish.</p>
         <form id="login-form">
           <label for="login-email">Email</label>
           <input id="login-email" name="email" type="email" autocomplete="username" required />
@@ -52,7 +52,9 @@
               <label>Current affiliation<input name="affiliation" data-profile-field="affiliation" maxlength="200" /></label>
               <label class="field-wide">About paragraphs<textarea name="about" data-profile-field="about" rows="7" placeholder="Separate paragraphs with a blank line"></textarea></label>
               <label>Photo URL<input name="photoUrl" data-profile-field="photoUrl" type="url" placeholder="https://…" /></label>
+              <label>Upload profile photo<input type="file" data-upload-profile="photoUrl" accept="image/jpeg,image/png,image/webp" /><small class="upload-status" aria-live="polite">JPG, PNG, or WebP; up to 15 MB. Uploaded files are public.</small></label>
               <label>Résumé URL<input name="resumeUrl" data-profile-field="resumeUrl" type="url" placeholder="https://…" /></label>
+              <label>Upload résumé PDF<input type="file" data-upload-profile="resumeUrl" data-upload-path-group="resume" accept="application/pdf" /><small class="upload-status" aria-live="polite">PDF up to 15 MB. Uploaded files are public.</small></label>
               <label>Email<input name="email" data-profile-field="email" type="email" /></label>
               <label>GitHub profile URL<input name="github" data-link-field="github" type="url" placeholder="https://github.com/…" /></label>
               <label>LinkedIn URL<input name="linkedin" data-link-field="linkedin" type="url" placeholder="https://…" /></label>

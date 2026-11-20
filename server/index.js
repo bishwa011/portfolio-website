@@ -121,7 +121,7 @@ function validateContent(content) {
   if (projects.some((item) => !textWithinLimit(item.description || "", 2000) ||
       !projectStatuses.has(item.status) || !Array.isArray(item.technologies) ||
       item.technologies.some((technology) => !textWithinLimit(technology, 100)) ||
-      !safeUrl(item.repositoryUrl) || !safeUrl(item.demoUrl))) {
+      !safeUrl(item.imageUrl) || !safeUrl(item.repositoryUrl) || !safeUrl(item.demoUrl))) {
     return "Check project descriptions, status, technologies, and links.";
   }
   if (skills.some((item) => !textWithinLimit(item.category, 120) || !Array.isArray(item.items) ||

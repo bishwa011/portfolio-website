@@ -153,7 +153,15 @@ function renderProjects(projects) {
     const card = create("article", "project-card");
     const preview = create("div", "project-preview");
     preview.setAttribute("aria-hidden", "true");
-    preview.append(create("span", "project-preview-mark", project.title.slice(0, 2).toUpperCase()));
+    const imageUrl = safeHttpsUrl(project.imageUrl);
+    if (imageUrl) {
+      const image = create("img");
+      image.src = imageUrl;
+      image.alt = "";
+      preview.append(image);
+    } else {
+      preview.append(create("span", "project-preview-mark", project.title.slice(0, 2).toUpperCase()));
+    }
     const details = create("div", "project-details");
     const meta = create("div", "card-meta");
     const status = { completed: "Completed project", in_progress: "In progress", planned: "Planned" }[project.status] || "Project";

@@ -44,7 +44,7 @@ The static HTML remains the page structure and fallback content. Once the backen
 - CSS3 with responsive layouts and reduced-motion support
 - Vanilla JavaScript for the public site and admin forms
 - Node.js 24 and Express 5 for the backend API
-- Supabase Postgres, Auth, and row-level security
+- Supabase Postgres, Auth, Storage, and row-level security
 - Render free web service for API hosting
 - Local SVG artwork
 
@@ -62,7 +62,7 @@ Before the backend is connected, edit visible content in `index.html`. After the
 - Add verified publication titles, exact statuses, and paper/DOI links in the admin page. Research directions and publications are separate lists.
 - Add projects with accurate descriptions and working repository/demo links. Mark projects as completed, in progress, or planned.
 - Add only technologies and methods you can support from your experience.
-- Add a photo URL, résumé URL, email, and profile links when you are ready to publish them. Empty fields stay hidden from visitors. There is no fake contact form.
+- Add a profile photo, project images, paper/poster/résumé PDFs, email, and profile links when ready. Uploads are limited to 15 MB and supported image/PDF types. Files in the portfolio bucket are publicly readable, so upload only materials you are ready to publish. Empty fields stay hidden from visitors. There is no fake contact form.
 - Edit colors and spacing near the top of `css/style.css`, where the shared CSS variables are defined.
 - Change the network artwork by editing `assets/research-network.svg` or replacing it with an image you have permission to use.
 
@@ -73,14 +73,14 @@ After changing a file, save it and refresh the browser. On GitHub Pages, allow a
 This project targets Node 24. The workspace currently had Node 18 installed, which is end-of-life; install the Node version in `.node-version` before running the backend.
 
 1. Create a free Supabase project.
-2. In its SQL Editor, run `supabase/schema.sql`. The file creates one JSONB content row, an admin-membership table, and row-level policies. The content is a single document because this portfolio has one owner and the editor saves a small, related set of fields together.
+2. In its SQL Editor, run `supabase/schema.sql`. The file creates one JSONB content row, an admin-membership table, a public-assets storage bucket, and row-level policies. The content is a single document because this portfolio has one owner and the editor saves a small, related set of fields together. Re-running the script is safe for the seeded content and policies.
 3. In Supabase Auth, create your own user. Copy that user's UUID, then run the final `insert into public.portfolio_admins...` statement shown in the SQL file with your UUID.
 4. Copy `.env.example` to `.env`. Add the project URL and **publishable key** from Supabase Project Settings → API Keys. Do not use a Supabase secret key or service-role key. Do not commit `.env` or paste credentials in chat.
 5. Install dependencies with `npm install`, then run `npm run dev` in one terminal.
 6. In another terminal, serve this folder with `python3 -m http.server 8000`.
-7. Open `http://localhost:8000/admin.html`, sign in with the Supabase user, edit fields, and select **Save portfolio content**. Open `http://localhost:8000/` to see the public content.
+7. Open `http://localhost:8000/admin.html`, sign in with the Supabase user, edit fields, upload a photo/image/PDF if desired, and select **Save portfolio content**. The file upload immediately sends the file to Supabase Storage; saving then publishes its link in the content record. Open `http://localhost:8000/` to see the public content.
 
-The admin page uses the Supabase JavaScript client from jsDelivr for sign-in. The backend uses Supabase's Data API with the user's access token and publishable key. Row-level security controls database reads and writes; no privileged key is used by browser or server code. The API validates content as a second check.
+The admin page uses the Supabase JavaScript client from jsDelivr for sign-in and direct file uploads. The backend uses Supabase's Data API with the user's access token and publishable key. Row-level security controls database reads, writes, and uploads; no privileged key is used by browser or server code. The API validates content as a second check. Supabase Storage serves files because Render's filesystem is temporary.
 
 ## Deploy the API
 
@@ -92,7 +92,11 @@ The static portfolio stays on GitHub Pages. The Node API runs separately on Rend
 4. Add the Render API URL to `js/backend-config.js` for non-local visitors, commit, and push. GitHub Pages will then load editable content through the API.
 5. Open the live `/admin.html`, sign in, and save a small content change. Refresh the public page to confirm it appears.
 
-Free services have limits: Render sleeps after 15 minutes without traffic and may take about a minute to wake; Supabase can pause a free project after a week of low activity. The managed database keeps data; do not store uploads or database files on Render's temporary filesystem. Treat the free deployment as a learning/demo environment, not a guaranteed always-available production service.
+## Free usage and file privacy
+
+No paid plan or payment method is required for this learning setup. Keep each service on its Free plan and do not enter payment details or upgrade. Current Supabase Free includes 1 GB of file storage, and its platform maximum upload size is 50 MB; this app and its bucket set a stricter 15 MB maximum. Supported uploads are JPEG/PNG/WebP images and PDFs. Render Free web services sleep after 15 idle minutes and wake on the next request; Supabase may pause a free project after a week of low activity. Quotas and provider terms can change. If a free quota is reached, stop uploading and review usage instead of upgrading. [Supabase Free plan and storage](https://supabase.com/pricing), [Supabase upload limits](https://supabase.com/docs/guides/storage/uploads/file-limits), [Render Free limits](https://render.com/docs/free).
+
+The `portfolio-assets` bucket is public so the public website can show images and link to papers without exposing a database secret. Its Storage policies permit public reads but restrict upload, update, and deletion to the approved admin. This means anyone with a file URL can view that file. Do not upload private manuscripts, personal records, credentials, or files you are not ready to publish. The managed database and storage keep data; do not store uploads on Render's temporary filesystem. Treat free hosting as a learning/demo environment, not a guaranteed always-available production service.
 
 ## Deploy to GitHub Pages
 

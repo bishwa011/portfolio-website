@@ -26,10 +26,10 @@ const collectionSettings = {
       { key: "title", label: "Title" },
       { key: "description", label: "Description", type: "textarea" },
       { key: "status", label: "Publication status", type: "select", options: ["", "Published", "Under Review", "Ongoing"] },
-      { key: "paperUrl", label: "Paper URL", type: "url" },
+      { key: "paperUrl", label: "Paper URL", type: "url", uploadAccept: "application/pdf", uploadLabel: "Upload paper PDF", pathGroup: "papers" },
       { key: "doiUrl", label: "DOI URL", type: "url" },
       { key: "codeUrl", label: "Code URL", type: "url" },
-      { key: "posterUrl", label: "Poster URL", type: "url" },
+      { key: "posterUrl", label: "Poster URL", type: "url", uploadAccept: "application/pdf,image/jpeg,image/png,image/webp", uploadLabel: "Upload poster PDF or image", pathGroup: "posters" },
     ],
     empty: () => ({ id: crypto.randomUUID(), title: "", description: "", status: "", paperUrl: "", doiUrl: "", codeUrl: "", posterUrl: "" }),
   },
@@ -40,11 +40,12 @@ const collectionSettings = {
       { key: "status", label: "Project status", type: "select", options: ["completed", "in_progress", "planned"] },
       { key: "description", label: "Purpose and description", type: "textarea" },
       { key: "year", label: "Year" },
+      { key: "imageUrl", label: "Project image URL", type: "url", uploadAccept: "image/jpeg,image/png,image/webp", uploadLabel: "Upload project image", pathGroup: "projects" },
       { key: "technologies", label: "Technologies (comma separated)", type: "tags" },
       { key: "repositoryUrl", label: "Repository URL", type: "url" },
       { key: "demoUrl", label: "Live demo URL", type: "url" },
     ],
-    empty: () => ({ id: crypto.randomUUID(), title: "", status: "planned", description: "", year: "", technologies: [], repositoryUrl: "", demoUrl: "" }),
+    empty: () => ({ id: crypto.randomUUID(), title: "", status: "planned", description: "", year: "", imageUrl: "", technologies: [], repositoryUrl: "", demoUrl: "" }),
   },
   skills: {
     container: "#skills-list",
@@ -72,8 +73,6 @@ function parseList(value) {
 }
 
 function addField(parent, field, item, index, collection) {
-  const label = document.createElement("label");
-  label.textContent = field.label;
   const value = item[field.key];
   let input;
 
@@ -101,8 +100,99 @@ function addField(parent, field, item, index, collection) {
   input.dataset.field = field.key;
   input.addEventListener("input", updateCollectionField);
   input.addEventListener("change", updateCollectionField);
-  label.append(input);
-  parent.append(label);
+
+  if (!field.uploadAccept) {
+    const label = document.createElement("label");
+    label.textContent = field.label;
+    label.append(input);
+    parent.append(label);
+    return;
+  }
+
+  const group = document.createElement("div");
+  group.className = "admin-upload-field";
+  const urlLabel = document.createElement("label");
+  urlLabel.textContent = field.label;
+  urlLabel.append(input);
+  const fileLabel = document.createElement("label");
+  fileLabel.className = "upload-control";
+  fileLabel.append(document.createTextNode(field.uploadLabel));
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = field.uploadAccept;
+  fileInput.dataset.uploadCollection = collection;
+  fileInput.dataset.uploadIndex = String(index);
+  fileInput.dataset.uploadTarget = field.key;
+  fileInput.dataset.uploadPathGroup = field.pathGroup;
+  fileInput.addEventListener("change", uploadPortfolioFile);
+  fileLabel.append(fileInput);
+  const status = document.createElement("small");
+  status.className = "upload-status";
+  status.setAttribute("aria-live", "polite");
+  status.textContent = "Choose a PDF or image; maximum 15 MB. Uploaded files are public.";
+  group.append(urlLabel, fileLabel, status);
+  parent.append(group);
+}
+
+async function uploadPortfolioFile(event) {
+  const fileInput = event.currentTarget;
+  const file = fileInput.files?.[0];
+  if (!file) return;
+  const statusContainer = fileInput.dataset.uploadCollection
+    ? fileInput.closest(".admin-upload-field")
+    : fileInput.closest("label");
+  const status = statusContainer?.querySelector(".upload-status");
+  const maxBytes = 15 * 1024 * 1024;
+  const acceptedTypes = fileInput.accept.split(",");
+  if (!acceptedTypes.includes(file.type)) {
+    status.textContent = "This file type is not supported. Choose one of the listed types.";
+    fileInput.value = "";
+    return;
+  }
+  if (file.size > maxBytes) {
+    status.textContent = "This file is larger than 15 MB. Choose a smaller file.";
+    fileInput.value = "";
+    return;
+  }
+
+  fileInput.disabled = true;
+  status.textContent = "Uploading file…";
+  try {
+    const { data: sessionResult } = await authClient.auth.getSession();
+    const userId = sessionResult.session?.user.id;
+    if (!userId) throw new Error("Your session expired. Sign in again.");
+
+    const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") || "file";
+    const path = `${userId}/${fileInput.dataset.uploadPathGroup}/${crypto.randomUUID()}.${extension}`;
+    const { error } = await authClient.storage.from("portfolio-assets").upload(path, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: false,
+    });
+    if (error) throw error;
+
+    const { data } = authClient.storage.from("portfolio-assets").getPublicUrl(path);
+    const url = data.publicUrl;
+    const collection = fileInput.dataset.uploadCollection;
+    if (collection) {
+      const item = portfolio[collection][Number(fileInput.dataset.uploadIndex)];
+      item[fileInput.dataset.uploadTarget] = url;
+      const itemCard = fileInput.closest(".admin-item");
+      const urlField = [...itemCard.querySelectorAll("[data-field]")]
+        .find((control) => control.dataset.field === fileInput.dataset.uploadTarget);
+      urlField.value = url;
+    } else {
+      const field = fileInput.dataset.uploadProfile;
+      portfolio.profile[field] = url;
+      document.querySelector(`[data-profile-field="${field}"]`).value = url;
+    }
+    status.textContent = "Uploaded. Save portfolio content to publish this link.";
+  } catch (error) {
+    status.textContent = error.message || "Upload failed. Check your connection and file type.";
+  } finally {
+    fileInput.disabled = false;
+    fileInput.value = "";
+  }
 }
 
 function renderCollection(name) {
@@ -196,6 +286,12 @@ document.querySelectorAll("[data-add-item]").forEach((button) => {
     portfolio[name].push(collectionSettings[name].empty());
     renderCollection(name);
   });
+});
+
+document.querySelectorAll("[data-upload-profile]").forEach((input) => {
+  input.dataset.uploadTarget = input.dataset.uploadProfile;
+  input.dataset.uploadPathGroup ||= "profile";
+  input.addEventListener("change", uploadPortfolioFile);
 });
 
 loginForm.addEventListener("submit", async (event) => {

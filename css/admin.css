@@ -12,6 +12,7 @@
 .admin-card > p { color: var(--muted); font-size: 0.9rem; }
 .admin-page form label { display: grid; margin: 0.65rem 0; gap: 0.35rem; color: #34433b; font-size: 0.82rem; font-weight: 700; }
 .admin-page input, .admin-page textarea, .admin-page select { width: 100%; min-height: 43px; padding: 0.65rem 0.7rem; border: 1px solid #cbd4c8; border-radius: 3px; background: #fff; color: var(--ink); font: inherit; font-size: 0.9rem; }
+.admin-page input[type="file"] { min-height: auto; padding: 0.45rem; font-size: 0.78rem; }
 .admin-page textarea { resize: vertical; }
 .admin-page input:focus-visible, .admin-page textarea:focus-visible, .admin-page select:focus-visible { outline: 3px solid #4d6e35; outline-offset: 2px; }
 .admin-page .button { cursor: pointer; }
@@ -29,6 +30,10 @@
 .admin-item-header strong { font-size: 0.88rem; }
 .admin-item-header button { padding: 0.35rem 0.5rem; border: 1px solid #d2b8ae; background: transparent; color: #7a3e32; font: inherit; font-size: 0.75rem; cursor: pointer; }
 .admin-item-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.25rem 0.8rem; }
+.admin-upload-field { min-width: 0; }
+.admin-upload-field label { margin: 0.65rem 0; }
+.admin-upload-field .upload-control { color: var(--green-deep); }
+.upload-status { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 400; line-height: 1.45; }
 .add-item { margin-top: 0.9rem; }
 .editor-toolbar { display: flex; margin-bottom: 1rem; align-items: center; justify-content: space-between; gap: 1rem; }
 .editor-toolbar p { margin: 0; color: var(--muted); font-size: 0.85rem; }
