@@ -1,6 +1,6 @@
 # Bishwa Prakash Subedi — Portfolio
 
-A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. The public site is static HTML, CSS, and JavaScript on GitHub Pages. A Node/Express API runs on Render, and Supabase provides Postgres, Auth, and Storage. The private editor is at `admin.html`; verify its first sign-in and save after the public API URL deploys.
+A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. The public site is static HTML, CSS, and JavaScript on GitHub Pages. A Node/Express API runs on Render, and Supabase provides Postgres, Auth, and Storage. The private editor is at `admin.html` and supports content edits, profile links, image uploads, and résumé uploads. The owner has verified the hosted editing and upload flow.
 
 **Live site:** <https://bishwa011.github.io/portfolio-website/>
 
@@ -112,9 +112,9 @@ For future edits:
 
 On GitHub Free, the source repository and published site are public. Never put private information, passwords, or secrets in either one. The local `requirements.md` and `conversation.md` files are excluded from the public repository by `.gitignore`.
 
-## Current limits and future improvements
+## Current status and future improvements
 
-The Supabase project, Render API, database policies, admin membership, CORS origin, and public API URL are configured. Complete the first end-to-end admin sign-in, content-save, public-refresh, and upload checks before treating the editor flow as verified. GitHub Pages cannot run server-side code, so the API is a separate service. Free-tier services may sleep or pause; use no paid upgrades for this learning project.
+The Supabase project, Render API, database policies, admin membership, CORS origin, and public API URL are configured. The owner has verified admin editing and profile/image/résumé updates on the hosted site. GitHub Pages cannot run server-side code, so the API is a separate service. Free-tier services may sleep or pause; this project uses free plans only.
 
 Possible learning steps, when requested:
 
