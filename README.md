@@ -1,6 +1,6 @@
 # Bishwa Prakash Subedi — Portfolio
 
-A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. The public site is static HTML, CSS, and JavaScript on GitHub Pages. A Node/Express API, Supabase Postgres/Auth, and a form-based admin page are being added as Version 2.
+A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. The public site is static HTML, CSS, and JavaScript on GitHub Pages. A Node/Express API runs on Render, and Supabase provides Postgres, Auth, and Storage. The private editor is at `admin.html`; verify its first sign-in and save after the public API URL deploys.
 
 **Live site:** <https://bishwa011.github.io/portfolio-website/>
 
@@ -17,7 +17,7 @@ portfolio-website/
 │   └── main.js                  # Mobile navigation and current year
 │   ├── content.js               # Loads editable content from the API when configured
 │   ├── admin.js                 # Admin sign-in, form fields, and save request
-│   └── backend-config.js        # Local API URL; add deployed API URL after setup
+│   └── backend-config.js        # Uses localhost during development and Render on the public site
 ├── assets/
 │   └── research-network.svg     # Local illustration used in the home section
 ├── server/
@@ -114,11 +114,11 @@ On GitHub Free, the source repository and published site are public. Never put p
 
 ## Current limits and future improvements
 
-The backend and admin editor are not ready for public use until a Supabase project and Render service are configured. The public page stays static until its API URL is set. GitHub Pages cannot run server-side code, so the API is a separate service. If this moves beyond a learning project, review the free-tier sleep/pause limits and upgrade or move hosts before relying on uptime.
+The Supabase project, Render API, database policies, admin membership, CORS origin, and public API URL are configured. Complete the first end-to-end admin sign-in, content-save, public-refresh, and upload checks before treating the editor flow as verified. GitHub Pages cannot run server-side code, so the API is a separate service. Free-tier services may sleep or pause; use no paid upgrades for this learning project.
 
 Possible learning steps, when requested:
 
-1. Finish account setup and connect the API to the published page.
-2. Add preview/publish controls and edit audit history.
+1. Verify first admin sign-in, content save, public refresh, and allowed file uploads.
+2. Add preview/publish controls and edit audit history if useful.
 3. Normalize the content into separate relational tables if the site gains multiple editors, complex filtering, or relations.
 4. Add dedicated research/project pages, visualizations, or a blog only when useful.
