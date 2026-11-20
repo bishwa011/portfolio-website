@@ -102,11 +102,13 @@ a:focus-visible, button:focus-visible { outline: 3px solid #39722f; outline-offs
 .publication-note p { margin: 0; color: #59665f; font-size: 0.82rem; }
 .publication-note strong { color: var(--ink); }
 .note-mark { display: grid; width: 1.35rem; height: 1.35rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--green); font-family: var(--serif); font-weight: 700; }
+.publication-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 
 /* Project feature */
 .section-projects { background: #e9ece4; }
 .project-card { display: grid; overflow: hidden; grid-template-columns: 0.9fr 1.1fr; border: 1px solid #d3dacf; background: var(--white); }
 .project-preview { display: grid; min-height: 340px; padding: 2rem; place-items: center; background: #dfe7d8; }
+.project-preview-mark { display: grid; width: 90px; height: 90px; place-items: center; border: 1px solid #9aaa8e; border-radius: 50%; background: var(--paper); color: var(--green-deep); font-family: var(--serif); font-size: 2rem; }
 .preview-window { width: min(100%, 360px); overflow: hidden; border: 1px solid #cdd7c8; border-radius: 6px; background: #fff; box-shadow: 0 18px 40px rgb(23 35 32 / 12%); transform: rotate(-2deg); }
 .preview-topbar { display: flex; height: 34px; padding: 0 0.7rem; align-items: center; gap: 0.3rem; border-bottom: 1px solid #e4e8e1; background: #fafbf8; }
 .preview-topbar i { width: 6px; height: 6px; border-radius: 50%; background: #bdc8b9; }
@@ -164,6 +166,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid #39722f; outline-offs
 .contact-details li:last-child { border-bottom: 1px solid #34413b; }
 .contact-details li > span:first-child { color: #e6ece7; }
 .placeholder-value { color: #a5b2aa; font-size: 0.76rem; text-align: right; }
+.contact-value { color: #c8e8a8; font-size: 0.78rem; text-align: right; text-decoration: none; }
+.contact-value:hover { color: var(--green); text-decoration: underline; }
+.contact-empty { color: #a5b2aa; font-size: 0.8rem; }
 .contact-hint { color: #93a199; font-size: 0.76rem; }
 .site-footer { padding-block: 1.5rem; background: #101816; color: #c4cec7; }
 .footer-inner, .footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
@@ -201,6 +206,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid #39722f; outline-offs
   .portrait-placeholder { font-size: 0.8rem; }
   .portrait-placeholder span { font-size: 1.8rem; }
   .research-grid { grid-template-columns: 1fr; }
+  .publication-grid { grid-template-columns: 1fr; }
   .research-card { min-height: auto; }
   .project-card { grid-template-columns: 1fr; }
   .project-preview { min-height: 270px; }

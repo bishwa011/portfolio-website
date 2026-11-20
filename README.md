@@ -1,6 +1,6 @@
 # Bishwa Prakash Subedi — Portfolio
 
-A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. Version 1 is a static website made with HTML, CSS, and vanilla JavaScript. It needs no installation, build step, framework, or server.
+A responsive personal portfolio for presenting graduate research, technical interests, and hands-on projects. The public site is static HTML, CSS, and JavaScript on GitHub Pages. A Node/Express API, Supabase Postgres/Auth, and a form-based admin page are being added as Version 2.
 
 **Live site:** <https://bishwa011.github.io/portfolio-website/>
 
@@ -15,14 +15,26 @@ portfolio-website/
 │   └── style.css                # Colors, layout, responsive design, and focus styles
 ├── js/
 │   └── main.js                  # Mobile navigation and current year
+│   ├── content.js               # Loads editable content from the API when configured
+│   ├── admin.js                 # Admin sign-in, form fields, and save request
+│   └── backend-config.js        # Local API URL; add deployed API URL after setup
 ├── assets/
 │   └── research-network.svg     # Local illustration used in the home section
+├── server/
+│   └── index.js                 # Express API and Supabase authentication/data requests
+├── supabase/
+│   └── schema.sql               # PostgreSQL table, seed content, and row access policies
+├── admin.html                   # Private portfolio editor UI (sign-in required to read/write)
+├── package.json                 # Node version and Express dependencies
+├── .node-version                # Node 24.22.1 for local/hosted consistency
+├── .env.example                 # Local environment-variable template
+├── render.yaml                  # Render API service setup
 ├── requirements.md              # Local project scope and learning roadmap
 ├── conversation.md              # Local decisions and learning notes
 └── .gitignore                   # Keeps the two learning notes out of the public repo
 ```
 
-The content is written directly in `index.html` so it is easy to find and change. The stylesheet controls presentation without changing the meaning of the page. The small JavaScript file only adds the collapsible mobile menu and updates the copyright year.
+The static HTML remains the page structure and fallback content. Once the backend is configured, `content.js` replaces editable text and cards with the published database content. `admin.html` gives you forms for editing profile fields and list entries. Its JavaScript sends one validated content update to the API; Express verifies your Supabase session, and PostgreSQL row-level security independently checks admin access.
 
 `requirements.md` and `conversation.md` are kept in the local learning folder and excluded from the public website repository.
 
@@ -30,29 +42,57 @@ The content is written directly in `index.html` so it is easy to find and change
 
 - HTML5 with semantic sections and accessible labels
 - CSS3 with responsive layouts and reduced-motion support
-- Vanilla JavaScript, with no external libraries or APIs
+- Vanilla JavaScript for the public site and admin forms
+- Node.js 24 and Express 5 for the backend API
+- Supabase Postgres, Auth, and row-level security
+- Render free web service for API hosting
 - Local SVG artwork
 
-## Run locally
+## Run the static site locally
 
 1. Open the `portfolio-website` folder.
 2. Open `index.html` in a browser.
 
-No local server is required. For a more realistic local web address, a simple static file server can be used later, but it is optional for this project.
+No local server is required for the static version. The admin page and API need local servers; see **Run the backend locally** below.
 
 ## Customize the content
 
-Open `index.html` in a text editor and search for `TODO` or the placeholder text.
+Before the backend is connected, edit visible content in `index.html`. After the backend is set up, use `admin.html` for profile and portfolio content; source edits remain necessary for layout and code changes.
 
-- Replace the profile-photo placeholder with a real image only when you choose one to publish. Put it under `assets/` and update the About section.
-- Add verified publication titles, exact statuses, and paper/DOI links in the Research section. The current cards are research directions, not publication claims.
-- Add projects with accurate descriptions and working repository/demo links. Label unfinished work as in progress.
+- Add verified publication titles, exact statuses, and paper/DOI links in the admin page. Research directions and publications are separate lists.
+- Add projects with accurate descriptions and working repository/demo links. Mark projects as completed, in progress, or planned.
 - Add only technologies and methods you can support from your experience.
-- Replace the email, LinkedIn, Google Scholar, ORCID, and résumé placeholders when you are ready to publish those details. There is no fake contact form.
+- Add a photo URL, résumé URL, email, and profile links when you are ready to publish them. Empty fields stay hidden from visitors. There is no fake contact form.
 - Edit colors and spacing near the top of `css/style.css`, where the shared CSS variables are defined.
 - Change the network artwork by editing `assets/research-network.svg` or replacing it with an image you have permission to use.
 
 After changing a file, save it and refresh the browser. On GitHub Pages, allow a short time for the new commit to publish, then refresh the hosted page.
+
+## Run the backend locally
+
+This project targets Node 24. The workspace currently had Node 18 installed, which is end-of-life; install the Node version in `.node-version` before running the backend.
+
+1. Create a free Supabase project.
+2. In its SQL Editor, run `supabase/schema.sql`. The file creates one JSONB content row, an admin-membership table, and row-level policies. The content is a single document because this portfolio has one owner and the editor saves a small, related set of fields together.
+3. In Supabase Auth, create your own user. Copy that user's UUID, then run the final `insert into public.portfolio_admins...` statement shown in the SQL file with your UUID.
+4. Copy `.env.example` to `.env`. Add the project URL and **publishable key** from Supabase Project Settings → API Keys. Do not use a Supabase secret key or service-role key. Do not commit `.env` or paste credentials in chat.
+5. Install dependencies with `npm install`, then run `npm run dev` in one terminal.
+6. In another terminal, serve this folder with `python3 -m http.server 8000`.
+7. Open `http://localhost:8000/admin.html`, sign in with the Supabase user, edit fields, and select **Save portfolio content**. Open `http://localhost:8000/` to see the public content.
+
+The admin page uses the Supabase JavaScript client from jsDelivr for sign-in. The backend uses Supabase's Data API with the user's access token and publishable key. Row-level security controls database reads and writes; no privileged key is used by browser or server code. The API validates content as a second check.
+
+## Deploy the API
+
+The static portfolio stays on GitHub Pages. The Node API runs separately on Render because Pages cannot run server-side code.
+
+1. Create a Render account and use **New → Blueprint** to connect this repository. `render.yaml` describes the API service.
+2. In the service's Environment settings, add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `ALLOWED_ORIGINS` (include the live Pages origin).
+3. Deploy and open `/api/health` on the Render URL; it should return `{"status":"ok"}`.
+4. Add the Render API URL to `js/backend-config.js` for non-local visitors, commit, and push. GitHub Pages will then load editable content through the API.
+5. Open the live `/admin.html`, sign in, and save a small content change. Refresh the public page to confirm it appears.
+
+Free services have limits: Render sleeps after 15 minutes without traffic and may take about a minute to wake; Supabase can pause a free project after a week of low activity. The managed database keeps data; do not store uploads or database files on Render's temporary filesystem. Treat the free deployment as a learning/demo environment, not a guaranteed always-available production service.
 
 ## Deploy to GitHub Pages
 
@@ -70,11 +110,11 @@ On GitHub Free, the source repository and published site are public. Never put p
 
 ## Current limits and future improvements
 
-This version does not have a server, database, dynamic publishing system, authentication, or working email form. GitHub Pages hosts static files and cannot run backend code. If the portfolio later needs a blog editor, saved user data, or other server-side behavior, the frontend can be carried forward while we add a backend and move deployment to a host that supports it.
+The backend and admin editor are not ready for public use until a Supabase project and Render service are configured. The public page stays static until its API URL is set. GitHub Pages cannot run server-side code, so the API is a separate service. If this moves beyond a learning project, review the free-tier sleep/pause limits and upgrade or move hosts before relying on uptime.
 
 Possible learning steps, when requested:
 
-1. Add a research/project filter or dedicated detail pages using vanilla JavaScript.
-2. Practice more JavaScript before considering React.
-3. Introduce a backend API and database for genuinely dynamic features.
-4. Add research visualizations, a blog, demos, or an admin interface as separate, deliberate projects.
+1. Finish account setup and connect the API to the published page.
+2. Add preview/publish controls and edit audit history.
+3. Normalize the content into separate relational tables if the site gains multiple editors, complex filtering, or relations.
+4. Add dedicated research/project pages, visualizations, or a blog only when useful.

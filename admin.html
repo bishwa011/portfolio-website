@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Portfolio editor · Bishwa Prakash Subedi</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/backend-config.js" defer></script>
+    <script src="js/admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <a class="skip-link" href="#admin-main">Skip to editor</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="index.html" aria-label="Return to portfolio">BPS<span>.</span></a>
+        <a class="admin-back-link" href="index.html">View public portfolio ↗</a>
+      </div>
+    </header>
+    <main class="admin-main" id="admin-main">
+      <header class="admin-heading">
+        <p class="eyebrow">Private editing area</p>
+        <h1>Portfolio <em>content</em></h1>
+        <p>Edit the information shown on the public portfolio. Empty optional fields stay hidden from visitors.</p>
+      </header>
+
+      <section class="admin-card" id="login-panel" aria-labelledby="login-title">
+        <h2 id="login-title">Sign in</h2>
+        <p>Use the account created for this portfolio in Supabase. There is no public sign-up.</p>
+        <form id="login-form">
+          <label for="login-email">Email</label>
+          <input id="login-email" name="email" type="email" autocomplete="username" required />
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+          <button class="button button-primary" type="submit">Sign in</button>
+        </form>
+        <p class="admin-status" id="login-status" aria-live="polite"></p>
+      </section>
+
+      <section id="editor-panel" hidden>
+        <div class="editor-toolbar"><p>Signed in to the portfolio editor</p><button class="button button-secondary" id="sign-out-button" type="button">Sign out</button></div>
+        <form id="content-form">
+          <section class="admin-card" aria-labelledby="profile-heading">
+            <div class="admin-section-heading"><p class="eyebrow">01 / Identity and contact</p><h2 id="profile-heading">Profile</h2></div>
+            <div class="admin-field-grid">
+              <label>Name<input name="name" data-profile-field="name" maxlength="120" required /></label>
+              <label>Location<input name="location" data-profile-field="location" maxlength="160" /></label>
+              <label class="field-wide">Introduction<textarea name="tagline" data-profile-field="tagline" rows="3" maxlength="500"></textarea></label>
+              <label>Degree / academic status<input name="degree" data-profile-field="degree" maxlength="200" /></label>
+              <label>Current affiliation<input name="affiliation" data-profile-field="affiliation" maxlength="200" /></label>
+              <label class="field-wide">About paragraphs<textarea name="about" data-profile-field="about" rows="7" placeholder="Separate paragraphs with a blank line"></textarea></label>
+              <label>Photo URL<input name="photoUrl" data-profile-field="photoUrl" type="url" placeholder="https://…" /></label>
+              <label>Résumé URL<input name="resumeUrl" data-profile-field="resumeUrl" type="url" placeholder="https://…" /></label>
+              <label>Email<input name="email" data-profile-field="email" type="email" /></label>
+              <label>GitHub profile URL<input name="github" data-link-field="github" type="url" placeholder="https://github.com/…" /></label>
+              <label>LinkedIn URL<input name="linkedin" data-link-field="linkedin" type="url" placeholder="https://…" /></label>
+              <label>Google Scholar URL<input name="scholar" data-link-field="scholar" type="url" placeholder="https://…" /></label>
+              <label>ORCID URL<input name="orcid" data-link-field="orcid" type="url" placeholder="https://orcid.org/…" /></label>
+            </div>
+          </section>
+
+          <section class="admin-card" aria-labelledby="research-heading">
+            <div class="admin-section-heading"><p class="eyebrow">02 / Research</p><h2 id="research-heading">Directions and publications</h2></div>
+            <div class="admin-list" id="research-list"></div>
+            <button class="button button-secondary add-item" type="button" data-add-item="research">Add research direction</button>
+            <div class="admin-list" id="publications-list"></div>
+            <button class="button button-secondary add-item" type="button" data-add-item="publications">Add publication</button>
+          </section>
+
+          <section class="admin-card" aria-labelledby="projects-heading">
+            <div class="admin-section-heading"><p class="eyebrow">03 / Software</p><h2 id="projects-heading">Projects</h2></div>
+            <div class="admin-list" id="projects-list"></div>
+            <button class="button button-secondary add-item" type="button" data-add-item="projects">Add project</button>
+          </section>
+
+          <section class="admin-card" aria-labelledby="skills-heading">
+            <div class="admin-section-heading"><p class="eyebrow">04 / Experience</p><h2 id="skills-heading">Skills and methods</h2></div>
+            <div class="admin-list" id="skills-list"></div>
+            <button class="button button-secondary add-item" type="button" data-add-item="skills">Add skill group</button>
+          </section>
+
+          <section class="admin-card" aria-labelledby="learning-heading">
+            <div class="admin-section-heading"><p class="eyebrow">05 / Learning</p><h2 id="learning-heading">Current focus</h2></div>
+            <div class="admin-field-grid">
+              <label class="field-wide">Learning introduction<textarea data-learning-field="intro" rows="3"></textarea></label>
+              <label class="field-wide">Current focus<textarea data-learning-field="currentFocus" rows="2"></textarea></label>
+              <label class="field-wide">Future experiments<textarea data-learning-field="nextExperiments" rows="2"></textarea></label>
+            </div>
+          </section>
+
+          <div class="save-bar"><p class="admin-status" id="save-status" aria-live="polite"></p><button class="button button-primary" id="save-button" type="submit">Save portfolio content</button></div>
+        </form>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="section-wrap footer-inner"><a class="wordmark" href="index.html">BPS<span>.</span></a><p>Portfolio content editor</p><a href="index.html" class="back-top">Return to site ↑</a></div></footer>
+  </body>
+</html>
